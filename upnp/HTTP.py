@@ -254,6 +254,7 @@ class HttpServer:
         """
         self.config = config
 
+    @asyncio.coroutine
     def InConnection(self, reader, writer):
         """
         A new incomming connection
