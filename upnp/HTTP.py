@@ -166,6 +166,7 @@ class HttpServer:
     def __init__(self, config):
         self.config = config
 
+    @asyncio.coroutine
     def InConnection(self, reader, writer):
         header = yield from reader.readline()
         cheaders = header.decode('latin1').strip()
