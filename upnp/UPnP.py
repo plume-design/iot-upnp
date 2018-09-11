@@ -11,13 +11,13 @@ class Annoncer:
     Annoncer main class
     """
 
-    def __init__(self, device, httpPort=5000, netBind='0.0.0.0'):
+    def __init__(self, device):
         self.device = None
         self.loop = asyncio.get_event_loop()
 
         #SSDP entry
-        self.ssdp = SSDP(self, netBind)
-        self.http = HTTP(self, httpPort, netBind)
+        self.ssdp = SSDP(self, device.bindAddr)
+        self.http = HTTP(self, device.port, device.bindAddr, device.secured)
         self.device = device
         self.configId = randrange(32000)
 

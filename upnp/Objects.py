@@ -28,6 +28,9 @@ class Device(BaseObj):
         self.modelNumber = ''
         self.upc = ''
         self.presentationURL = ''
+        self.bindAddr = '0.0.0.0'
+        self.port = -1
+        self.secured = False
 
         super(Device, self).__init__(obj)
 

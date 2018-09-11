@@ -40,6 +40,7 @@ class Notify(ssdp.SSDPRequest):
         self.uuid = device.uuid
         self.counter = 0
         self.location = 'http://ff:1900/description.xml'
+        self.secured = device.secured
         super(Notify, self).__init__('NOTIFY')
 
     def send(self, ip, usn = None, transport = None):
@@ -49,9 +50,14 @@ class Notify(ssdp.SSDPRequest):
         if usn == None:
             usn = 'uuid:' + self.uuid
 
+        if self.secured is True:
+            access = 'https://'
+        else:
+            access = 'http://'
+
         self.headers = [
             ('Host', '239.255.255.250'),
-            ('LOCATION', 'http://' + ip + ':' + str(self.config.annoncer.http.port) + '/descr.xml'),
+            ('LOCATION', access + ip + ':' + str(self.config.annoncer.http.port) + '/descr.xml'),
             ('NTS', self.nts),
             ('SERVER', ip),
             ('NT', self.nt),
@@ -82,6 +88,11 @@ class Answer(ssdp.SSDPResponse):
     def send(self, device, ip, addr):
         import datetime
 
+        if device.secured is True:
+            access = 'https://'
+        else:
+            access = 'http://'
+
         self.headers = [
             ('CACHE-CONTROL',  'max-age=' + str(self.config.maxage)),
             ('DATE', datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')),
@@ -89,7 +100,7 @@ class Answer(ssdp.SSDPResponse):
             ('USN', device.uuid + '::' + device.st),
             ('EXT', ''),
             ('SERVER', self.config.signature),
-            ('LOCATION', 'http://' + ip + ':' + str(self.config.annoncer.http.port) + '/descr.xml'),
+            ('LOCATION', access + ip + ':' + str(self.config.annoncer.http.port) + '/descr.xml'),
             ('BOOTID.UPNP.ORG', self.config.srv.annonces.count),
             ('CONFIGID.UPNP.ORG', self.config.annoncer.configId),
         ]
