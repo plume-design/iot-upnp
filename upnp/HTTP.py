@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import logging
+import ssl
+
 from socket import gethostname
 
 class HttpRequest:
@@ -305,40 +308,24 @@ class HttpServer:
         return ans
 
 class HTTP:
-    """
-    The main HTTP server class
-    """
-
-    def __init__(self, annoncer, port, netbind):
-        """
-        Initiate an HTTP Server
-
-        :param annoncer: The UPnP configuration
-        :type annoncer: upnp.UPnP.Announcer
-        :param port: HTTP port
-        :type port: int
-        :param netbind: Interface address to bind
-        :type netbind: str
-        """
-
+    def __init__(self, annoncer, port, netbind, secured):
         self.port = port
         self.netbind = netbind
         self.server = None
         self.http_server = HttpServer(self)
         self.annoncer = annoncer
-
+        self.secured = secured
         if self.netbind == '0.0.0.0':
             self.netbind = None
 
+        logging.info("netbind: {}".format(netbind))
     def initLoop(self, loop):
-        """
-        Add HTTP handlers on the asyncio loop
-
-        :param loop: Loop to use
-        :type loop: asyncio.AbstractEventLoop
-        """
-
-        self.server = asyncio.start_server(self.http_server.InConnection, port=self.port, host=self.netbind)
+        sc=None
+        if self.secured is True:
+            sc = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            sc.load_cert_chain('selfsigned.cert', 'selfsigned.key')
+        self.server = asyncio.start_server(self.http.InConnection, port=self.port,
+                                           host=self.netbind, ssl=sc)
         self.httploop = loop.run_until_complete(self.server)
 
     def dispose(self):
