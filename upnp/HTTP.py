@@ -324,7 +324,7 @@ class HTTP:
         if self.secured is True:
             sc = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             sc.load_cert_chain('selfsigned.cert', 'selfsigned.key')
-        self.server = asyncio.start_server(self.http.InConnection, port=self.port,
+        self.server = asyncio.start_server(self.http_server.InConnection, port=self.port,
                                            host=self.netbind, ssl=sc)
         self.httploop = loop.run_until_complete(self.server)
 
