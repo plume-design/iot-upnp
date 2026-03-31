@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import ssdp
+import ssdp.aio
+import ssdp.messages
 import socket
 import struct
 import netifaces
 
-class AnnouncerService(ssdp.SimpleServiceDiscoveryProtocol):
+class AnnouncerService(ssdp.aio.SimpleServiceDiscoveryProtocol):
     """
     Endpoint for UDP packets (used by asyncio)
     """
+    MULTICAST_ADDRESS = '239.255.255.250'
+
     def __init__(self):
         """
         Initiate the UDP endpoint
@@ -51,7 +54,7 @@ class AnnouncerService(ssdp.SimpleServiceDiscoveryProtocol):
             if self.annonces.provides(headers['ST']):
                 self.annonces.answer(headers['ST'], addr)
 
-class Notify(ssdp.SSDPRequest):
+class Notify(ssdp.messages.SSDPRequest):
     """
     SSDP Notify packet
     """
@@ -129,7 +132,7 @@ class Notify(ssdp.SSDPRequest):
         transport.sendto(msg, addr)
         self.config.srv.annonces.count = self.config.srv.annonces.count + 1
 
-class Answer(ssdp.SSDPResponse):
+class Answer(ssdp.messages.SSDPResponse):
     """
     Answer packet for M-SEARCH queries
     """
